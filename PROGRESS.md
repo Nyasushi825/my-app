@@ -104,9 +104,44 @@ claude/trusting-allen-Xk9Oi   開発ブランチ（現在）
 
 ---
 
-## 残課題 / 今後の拡張アイデア
+## 次の実装予定
 
-- [ ] **ダークモード** — Tailwind の `dark:` クラスで切り替え、設定を localStorage に保存
+### 🎯 直近：ダークモード実装 (進行中)
+
+**目的：** Tailwind CSS の `dark:` クラス群を使い、ライト/ダーク切り替えをサポート。設定は localStorage 保存。
+
+**実装手順：**
+1. `app/layout.tsx` に Theme Provider ロジックを追加（HTML class="dark" 制御）
+2. `components/SummaryCard.tsx` → `dark:bg-gray-800` など Dark 対応クラスを追加
+3. `components/SubscriptionForm.tsx` → フォーム要素を Dark 対応
+4. `components/SubscriptionList.tsx` → カード background, text, border を Dark 対応
+5. `components/CalendarView.tsx` → Calendar も Dark 対応
+6. `components/ListControls.tsx` → 検索・ソート UI を Dark 対応
+7. UI に Theme Toggle ボタン追加（ハンバーガーメニューか Header）
+8. `globals.css` に必要に応じて Dark mode 用 CSS 追加
+
+**対象ファイル（優先順）：**
+```
+app/layout.tsx               ← 最優先。Theme Provider を実装
+app/globals.css              ← Dark mode CSS
+components/SummaryCard.tsx   
+components/SubscriptionList.tsx
+components/SubscriptionForm.tsx
+components/CalendarView.tsx
+components/ListControls.tsx
+```
+
+**完了チェック：**
+- [ ] Theme Provider ロジック実装
+- [ ] 全コンポーネント Dark クラス適用
+- [ ] Toggle UI 追加＆動作確認
+- [ ] localStorage での設定保存確認
+- [ ] ブラウザの `prefers-color-scheme` に従うか確認
+
+---
+
+## その他の残課題 / 拡張アイデア
+
 - [ ] **多通貨対応** — USD / EUR など円以外の通貨表示
 - [ ] **通知** — 請求日 X 日前にブラウザ Push 通知
 - [ ] **Supabase 連携** — アカウント間で同期（Shinさんの構成に合わせる）
