@@ -19,13 +19,14 @@ function emptyForm(): SubscriptionInput {
     nextBillingDate: today(),
     color: DEFAULT_COLOR,
     memo: "",
+    cancelUrl: "",
   };
 }
 
 // Subscription から編集用の入力値だけを取り出す
 function toInput(sub: Subscription): SubscriptionInput {
-  const { name, price, cycle, nextBillingDate, color, memo } = sub;
-  return { name, price, cycle, nextBillingDate, color, memo };
+  const { name, price, cycle, nextBillingDate, color, memo, cancelUrl } = sub;
+  return { name, price, cycle, nextBillingDate, color, memo, cancelUrl };
 }
 
 // サブスクを登録・編集するフォーム
@@ -102,6 +103,7 @@ export function SubscriptionForm({
                   price: t.price,
                   cycle: t.cycle,
                   color: t.color,
+                  cancelUrl: t.cancelUrl,
                 }))
               }
               className="rounded-full border border-slate-200 px-2.5 py-1 text-xs text-slate-600 transition hover:border-brand-300 hover:bg-brand-50"
@@ -178,6 +180,19 @@ export function SubscriptionForm({
               className="h-[38px] w-full cursor-pointer rounded-lg border border-slate-300 p-1"
             />
           </div>
+        </div>
+
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-600">
+            解約手順URL（任意）
+          </label>
+          <input
+            type="url"
+            value={form.cancelUrl ?? ""}
+            onChange={(e) => update("cancelUrl", e.target.value)}
+            placeholder="https://..."
+            className={inputClass}
+          />
         </div>
 
         <div>

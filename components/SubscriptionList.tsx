@@ -13,17 +13,17 @@ function initial(name: string): string {
   return name.trim().charAt(0).toUpperCase() || "?";
 }
 
-// 登録済みサブスクの一覧
+// 契約中サブスクの一覧（編集・解約手順リンク・解約）
 export function SubscriptionList({
   subscriptions,
   editingId,
   onEdit,
-  onRemove,
+  onCancel,
 }: {
   subscriptions: Subscription[];
   editingId: string | null;
   onEdit: (sub: Subscription) => void;
-  onRemove: (id: string) => void;
+  onCancel: (id: string) => void;
 }) {
   if (subscriptions.length === 0) {
     return (
@@ -44,80 +44,98 @@ export function SubscriptionList({
       {subscriptions.map((sub) => (
         <li
           key={sub.id}
-          className={`flex items-center gap-3 rounded-2xl border bg-white p-4 shadow-sm transition ${
+          className={`rounded-2xl border bg-white p-4 shadow-sm transition ${
             editingId === sub.id
               ? "border-brand-500 ring-2 ring-brand-100"
               : "border-slate-200"
           }`}
         >
-          <div
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-lg font-bold text-white"
-            style={{ backgroundColor: sub.color }}
-          >
-            {initial(sub.name)}
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-semibold text-slate-800">{sub.name}</p>
-            <p className="mt-0.5 text-xs text-slate-500">
-              次回請求 {formatDate(sub.nextBillingDate)}
-              {sub.memo ? ` ・ ${sub.memo}` : ""}
-            </p>
-          </div>
-
-          <div className="text-right">
-            <p className="font-semibold text-slate-800">
-              {formatYen(sub.price)}
-            </p>
-            <p className="text-xs text-slate-500">
-              {cycleLabel(sub.cycle)}
-              {sub.cycle === "yearly" && (
-                <span className="ml-1 text-slate-400">
-                  (月{formatYen(toMonthly(sub))})
-                </span>
-              )}
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => onEdit(sub)}
-            aria-label={`${sub.name}を編集`}
-            className="ml-1 shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-brand-50 hover:text-brand-600"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-4 w-4"
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-lg font-bold text-white"
+              style={{ backgroundColor: sub.color }}
             >
-              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
-            </svg>
-          </button>
+              {initial(sub.name)}
+            </div>
 
-          <button
-            type="button"
-            onClick={() => onRemove(sub.id)}
-            aria-label={`${sub.name}を削除`}
-            className="shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-4 w-4"
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-semibold text-slate-800">{sub.name}</p>
+              <p className="mt-0.5 text-xs text-slate-500">
+                次回請求 {formatDate(sub.nextBillingDate)}
+                {sub.memo ? ` ・ ${sub.memo}` : ""}
+              </p>
+            </div>
+
+            <div className="text-right">
+              <p className="font-semibold text-slate-800">
+                {formatYen(sub.price)}
+              </p>
+              <p className="text-xs text-slate-500">
+                {cycleLabel(sub.cycle)}
+                {sub.cycle === "yearly" && (
+                  <span className="ml-1 text-slate-400">
+                    (月{formatYen(toMonthly(sub))})
+                  </span>
+                )}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onEdit(sub)}
+              aria-label={`${sub.name}を編集`}
+              className="ml-1 shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-brand-50 hover:text-brand-600"
             >
-              <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v14a1 1 0 01-1 1H6a1 1 0 01-1-1V6" />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+              >
+                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+              </svg>
+            </button>
+          </div>
+
+          {/* 解約手順リンク＋解約ボタン */}
+          <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2.5">
+            {sub.cancelUrl ? (
+              <a
+                href={sub.cancelUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:underline"
+              >
+                解約手順を見る
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-3 w-3"
+                >
+                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
+                </svg>
+              </a>
+            ) : (
+              <span className="text-xs text-slate-300">解約手順URL未設定</span>
+            )}
+
+            <button
+              type="button"
+              onClick={() => onCancel(sub.id)}
+              className="rounded-lg border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+            >
+              解約する
+            </button>
+          </div>
         </li>
       ))}
     </ul>

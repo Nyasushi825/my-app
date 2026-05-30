@@ -61,6 +61,26 @@ export function useSubscriptions() {
     [],
   );
 
+  // 解約する（削除せず履歴として残す）
+  const cancelSubscription = useCallback((id: string) => {
+    setSubscriptions((prev) =>
+      prev.map((s) =>
+        s.id === id
+          ? { ...s, status: "cancelled", cancelledAt: Date.now() }
+          : s,
+      ),
+    );
+  }, []);
+
+  // 解約を取り消して契約中に戻す
+  const restoreSubscription = useCallback((id: string) => {
+    setSubscriptions((prev) =>
+      prev.map((s) =>
+        s.id === id ? { ...s, status: "active", cancelledAt: undefined } : s,
+      ),
+    );
+  }, []);
+
   const removeSubscription = useCallback((id: string) => {
     setSubscriptions((prev) => prev.filter((s) => s.id !== id));
   }, []);
@@ -70,6 +90,8 @@ export function useSubscriptions() {
     loaded,
     addSubscription,
     updateSubscription,
+    cancelSubscription,
+    restoreSubscription,
     removeSubscription,
   };
 }

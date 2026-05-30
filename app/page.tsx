@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CalendarView } from "@/components/CalendarView";
+import { CancelledList } from "@/components/CancelledList";
 import { SubscriptionForm } from "@/components/SubscriptionForm";
 import { SubscriptionList } from "@/components/SubscriptionList";
 import { SummaryCard } from "@/components/SummaryCard";
-import type { Subscription } from "@/lib/types";
+import { isActive, type Subscription } from "@/lib/types";
 import { useSubscriptions } from "@/lib/useSubscriptions";
 
 export default function Home() {
@@ -14,11 +15,25 @@ export default function Home() {
     loaded,
     addSubscription,
     updateSubscription,
+    cancelSubscription,
+    restoreSubscription,
     removeSubscription,
   } = useSubscriptions();
 
   // 編集中のサブスク（nullなら新規登録モード）
   const [editing, setEditing] = useState<Subscription | null>(null);
+
+  // 契約中・解約済みに振り分ける
+  const active = useMemo(() => subscriptions.filter(isActive), [subscriptions]);
+  const cancelled = useMemo(
+    () => subscriptions.filter((s) => !isActive(s)),
+    [subscriptions],
+  );
+
+  function handleCancel(id: string) {
+    if (editing?.id === id) setEditing(null);
+    cancelSubscription(id);
+  }
 
   function handleRemove(id: string) {
     if (editing?.id === id) setEditing(null);
@@ -34,7 +49,7 @@ export default function Home() {
         </h1>
       </header>
 
-      <SummaryCard subscriptions={subscriptions} />
+      <SummaryCard subscriptions={active} />
 
       <div className="mt-6 grid gap-6 md:grid-cols-2">
         <SubscriptionForm
@@ -53,10 +68,10 @@ export default function Home() {
           </h2>
           {loaded ? (
             <SubscriptionList
-              subscriptions={subscriptions}
+              subscriptions={active}
               editingId={editing?.id ?? null}
               onEdit={setEditing}
-              onRemove={handleRemove}
+              onCancel={handleCancel}
             />
           ) : (
             <p className="text-sm text-slate-400">読み込み中...</p>
@@ -65,8 +80,14 @@ export default function Home() {
       </div>
 
       <div className="mt-6">
-        <CalendarView subscriptions={subscriptions} />
+        <CalendarView subscriptions={active} />
       </div>
+
+      <CancelledList
+        subscriptions={cancelled}
+        onRestore={restoreSubscription}
+        onRemove={handleRemove}
+      />
 
       <footer className="mt-12 text-center text-xs text-slate-400">
         データはお使いのブラウザ内（localStorage）に保存されます
