@@ -25,7 +25,7 @@ export function ListControls({
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+          className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
         >
           <circle cx="11" cy="11" r="8" />
           <path d="M21 21l-4.3-4.3" />
@@ -36,14 +36,14 @@ export function ListControls({
           onChange={(e) => onQueryChange(e.target.value)}
           placeholder="名前・メモで検索"
           aria-label="サブスクを検索"
-          className="w-full rounded-lg border border-slate-300 py-2 pl-8 pr-3 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+          className="w-full rounded-lg border border-slate-300 py-2 pl-8 pr-3 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-brand-500/30"
         />
       </div>
       <select
         value={sort}
         onChange={(e) => onSortChange(e.target.value as SortKey)}
         aria-label="並び替え"
-        className="rounded-lg border border-slate-300 px-2 py-2 text-sm text-slate-600 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+        className="rounded-lg border border-slate-300 px-2 py-2 text-sm text-slate-600 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:focus:ring-brand-500/30"
       >
         {SORT_OPTIONS.map((o) => (
           <option key={o.value} value={o.value}>

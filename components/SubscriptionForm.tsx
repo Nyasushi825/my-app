@@ -78,14 +78,14 @@ export function SubscriptionForm({
   }
 
   const inputClass =
-    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100";
+    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-brand-500/30";
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
     >
-      <h2 className="text-base font-semibold text-slate-800">
+      <h2 className="text-base font-semibold text-slate-800 dark:text-slate-200">
         {editing ? "サブスクを編集" : "サブスクを登録"}
       </h2>
 
@@ -106,7 +106,7 @@ export function SubscriptionForm({
                   cancelUrl: t.cancelUrl,
                 }))
               }
-              className="rounded-full border border-slate-200 px-2.5 py-1 text-xs text-slate-600 transition hover:border-brand-300 hover:bg-brand-50"
+              className="rounded-full border border-slate-200 px-2.5 py-1 text-xs text-slate-600 transition hover:border-brand-300 hover:bg-brand-50 dark:border-slate-600 dark:text-slate-300 dark:hover:border-brand-500 dark:hover:bg-slate-800"
             >
               {t.name}
             </button>
@@ -116,7 +116,7 @@ export function SubscriptionForm({
 
       <div className="mt-4 space-y-3">
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
+          <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
             サービス名
           </label>
           <input
@@ -130,7 +130,7 @@ export function SubscriptionForm({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
               金額（円）
             </label>
             <input
@@ -143,7 +143,7 @@ export function SubscriptionForm({
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
               請求サイクル
             </label>
             <select
@@ -159,7 +159,7 @@ export function SubscriptionForm({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
               次回請求日
             </label>
             <input
@@ -170,20 +170,20 @@ export function SubscriptionForm({
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
               カラー
             </label>
             <input
               type="color"
               value={form.color}
               onChange={(e) => update("color", e.target.value)}
-              className="h-[38px] w-full cursor-pointer rounded-lg border border-slate-300 p-1"
+              className="h-[38px] w-full cursor-pointer rounded-lg border border-slate-300 p-1 dark:border-slate-600 dark:bg-slate-800"
             />
           </div>
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
+          <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
             解約手順URL（任意）
           </label>
           <input
@@ -196,7 +196,7 @@ export function SubscriptionForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
+          <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
             メモ（任意）
           </label>
           <input
@@ -222,7 +222,7 @@ export function SubscriptionForm({
           <button
             type="button"
             onClick={onCancelEdit}
-            className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+            className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
           >
             キャンセル
           </button>

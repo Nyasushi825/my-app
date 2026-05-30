@@ -27,12 +27,12 @@ export function SubscriptionList({
 }) {
   if (subscriptions.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
+      <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center dark:border-slate-700 dark:bg-slate-900">
         <p className="text-3xl">📦</p>
-        <p className="mt-2 text-sm font-medium text-slate-600">
+        <p className="mt-2 text-sm font-medium text-slate-600 dark:text-slate-300">
           まだサブスクが登録されていません
         </p>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
           左のフォームから最初のサブスクを追加しましょう
         </p>
       </div>
@@ -44,10 +44,10 @@ export function SubscriptionList({
       {subscriptions.map((sub) => (
         <li
           key={sub.id}
-          className={`rounded-2xl border bg-white p-4 shadow-sm transition ${
+          className={`rounded-2xl border bg-white p-4 shadow-sm transition dark:bg-slate-900 ${
             editingId === sub.id
-              ? "border-brand-500 ring-2 ring-brand-100"
-              : "border-slate-200"
+              ? "border-brand-500 ring-2 ring-brand-100 dark:ring-brand-500/30"
+              : "border-slate-200 dark:border-slate-700"
           }`}
         >
           <div className="flex items-center gap-3">
@@ -59,21 +59,21 @@ export function SubscriptionList({
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="truncate font-semibold text-slate-800">{sub.name}</p>
-              <p className="mt-0.5 text-xs text-slate-500">
+              <p className="truncate font-semibold text-slate-800 dark:text-slate-100">{sub.name}</p>
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                 次回請求 {formatDate(sub.nextBillingDate)}
                 {sub.memo ? ` ・ ${sub.memo}` : ""}
               </p>
             </div>
 
             <div className="text-right">
-              <p className="font-semibold text-slate-800">
+              <p className="font-semibold text-slate-800 dark:text-slate-100">
                 {formatYen(sub.price)}
               </p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {cycleLabel(sub.cycle)}
                 {sub.cycle === "yearly" && (
-                  <span className="ml-1 text-slate-400">
+                  <span className="ml-1 text-slate-400 dark:text-slate-500">
                     (月{formatYen(toMonthly(sub))})
                   </span>
                 )}
@@ -84,7 +84,7 @@ export function SubscriptionList({
               type="button"
               onClick={() => onEdit(sub)}
               aria-label={`${sub.name}を編集`}
-              className="ml-1 shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-brand-50 hover:text-brand-600"
+              className="ml-1 shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-brand-50 hover:text-brand-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-brand-400"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -102,13 +102,13 @@ export function SubscriptionList({
           </div>
 
           {/* 解約手順リンク＋解約ボタン */}
-          <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2.5">
+          <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2.5 dark:border-slate-800">
             {sub.cancelUrl ? (
               <a
                 href={sub.cancelUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
               >
                 解約手順を見る
                 <svg
@@ -125,13 +125,13 @@ export function SubscriptionList({
                 </svg>
               </a>
             ) : (
-              <span className="text-xs text-slate-300">解約手順URL未設定</span>
+              <span className="text-xs text-slate-300 dark:text-slate-600">解約手順URL未設定</span>
             )}
 
             <button
               type="button"
               onClick={() => onCancel(sub.id)}
-              className="rounded-lg border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+              className="rounded-lg border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-slate-700 dark:text-slate-300 dark:hover:border-red-900 dark:hover:bg-red-950 dark:hover:text-red-400"
             >
               解約する
             </button>

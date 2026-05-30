@@ -24,9 +24,9 @@ export function CancelledList({
 
   return (
     <section className="mt-6">
-      <h2 className="mb-3 text-base font-semibold text-slate-800">
+      <h2 className="mb-3 text-base font-semibold text-slate-800 dark:text-slate-200">
         解約履歴
-        <span className="ml-2 text-xs font-normal text-slate-400">
+        <span className="ml-2 text-xs font-normal text-slate-400 dark:text-slate-500">
           {subscriptions.length}件
         </span>
       </h2>
@@ -35,13 +35,13 @@ export function CancelledList({
         {subscriptions.map((sub) => (
           <li
             key={sub.id}
-            className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
+            className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800/50"
           >
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-slate-500 line-through">
+              <p className="truncate text-sm font-medium text-slate-500 line-through dark:text-slate-400">
                 {sub.name}
               </p>
-              <p className="mt-0.5 text-xs text-slate-400">
+              <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                 {formatYen(sub.price)} / {cycleLabel(sub.cycle)}
                 {sub.cancelledAt && ` ・ ${formatCancelledAt(sub.cancelledAt)} に解約`}
               </p>
@@ -50,7 +50,7 @@ export function CancelledList({
             <button
               type="button"
               onClick={() => onRestore(sub.id)}
-              className="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-brand-600 transition hover:bg-brand-50"
+              className="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-brand-600 transition hover:bg-brand-50 dark:border-slate-600 dark:bg-slate-900 dark:text-brand-400 dark:hover:bg-slate-800"
             >
               復元
             </button>
@@ -58,7 +58,7 @@ export function CancelledList({
               type="button"
               onClick={() => onRemove(sub.id)}
               aria-label={`${sub.name}を完全に削除`}
-              className="shrink-0 rounded-lg p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
+              className="shrink-0 rounded-lg p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-500 dark:text-slate-500 dark:hover:bg-red-950 dark:hover:text-red-400"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

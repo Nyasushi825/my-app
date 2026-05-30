@@ -48,26 +48,26 @@ export function CalendarView({ subscriptions }: { subscriptions: Subscription[] 
   }
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-base font-semibold text-slate-800">請求日カレンダー</h2>
+        <h2 className="text-base font-semibold text-slate-800 dark:text-slate-200">請求日カレンダー</h2>
         <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => shiftMonth(-1)}
             aria-label="前の月"
-            className="rounded-lg px-2 py-1 text-slate-500 transition hover:bg-slate-100"
+            className="rounded-lg px-2 py-1 text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
           >
             ‹
           </button>
-          <span className="min-w-[6.5rem] text-center text-sm font-medium text-slate-700">
+          <span className="min-w-[6.5rem] text-center text-sm font-medium text-slate-700 dark:text-slate-300">
             {year}年{month + 1}月
           </span>
           <button
             type="button"
             onClick={() => shiftMonth(1)}
             aria-label="次の月"
-            className="rounded-lg px-2 py-1 text-slate-500 transition hover:bg-slate-100"
+            className="rounded-lg px-2 py-1 text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
           >
             ›
           </button>
@@ -79,7 +79,11 @@ export function CalendarView({ subscriptions }: { subscriptions: Subscription[] 
           <div
             key={w}
             className={`pb-1 text-xs font-medium ${
-              i === 0 ? "text-red-500" : i === 6 ? "text-blue-500" : "text-slate-500"
+              i === 0
+                ? "text-red-500"
+                : i === 6
+                  ? "text-blue-500"
+                  : "text-slate-500 dark:text-slate-400"
             }`}
           >
             {w}
@@ -98,12 +102,16 @@ export function CalendarView({ subscriptions }: { subscriptions: Subscription[] 
             <div
               key={day}
               className={`min-h-[3.25rem] rounded-lg border p-1 text-left ${
-                isToday ? "border-brand-400 bg-brand-50" : "border-transparent"
+                isToday
+                  ? "border-brand-400 bg-brand-50 dark:border-brand-500/60 dark:bg-brand-500/10"
+                  : "border-transparent"
               }`}
             >
               <div
                 className={`text-xs ${
-                  isToday ? "font-bold text-brand-700" : "text-slate-600"
+                  isToday
+                    ? "font-bold text-brand-700 dark:text-brand-300"
+                    : "text-slate-600 dark:text-slate-400"
                 }`}
               >
                 {day}
@@ -124,7 +132,7 @@ export function CalendarView({ subscriptions }: { subscriptions: Subscription[] 
       </div>
 
       {subscriptions.length === 0 && (
-        <p className="mt-3 text-center text-xs text-slate-400">
+        <p className="mt-3 text-center text-xs text-slate-400 dark:text-slate-500">
           サブスクを登録すると、請求日がこのカレンダーに表示されます
         </p>
       )}

@@ -84,6 +84,25 @@ components/ServiceWorkerRegister.tsx  クライアント側 SW 登録
 
 ---
 
+### 6. ダークモード対応 ✅
+
+- Tailwind の `darkMode: "class"` を有効化し、`<html class="dark">` で全体を制御
+- ヘッダー右上に**テーマ切り替えトグル**（月／太陽アイコン）を追加
+- 設定は `localStorage`（`subsuku-box:theme`）に保存
+- 未設定時は OS の `prefers-color-scheme` に追従
+- `layout.tsx` のインラインスクリプトで描画前にクラスを確定し、**FOUC（ちらつき）を防止**
+- 全コンポーネント（フォーム／一覧／カレンダー／検索・ソート／解約履歴／ヘッダー）に `dark:` クラスを適用
+- `globals.css` で `.dark` に `color-scheme: dark` を設定し、フォーム部品やスクロールバーもダークに追従
+- サマリーカードはブランドカラーのグラデーションのため、両モード共通で維持
+
+**追加ファイル**
+```
+lib/useTheme.ts             テーマ状態の管理（localStorage 保存つき）フック
+components/ThemeToggle.tsx   ライト/ダーク切り替えトグルボタン
+```
+
+---
+
 ## 技術スタック
 
 | 項目 | バージョン |
@@ -91,52 +110,38 @@ components/ServiceWorkerRegister.tsx  クライアント側 SW 登録
 | Next.js | 16（App Router） |
 | React | 19 |
 | TypeScript | 最新安定版 |
-| Tailwind CSS | v4 |
+| Tailwind CSS | v3.4（`darkMode: "class"`） |
 
 ---
 
 ## ブランチ
 
 ```
-main                          初期コミット
-claude/trusting-allen-Xk9Oi   開発ブランチ（現在）
+main                            初期コミット
+claude/trusting-allen-Xk9Oi     旧開発ブランチ
+claude/dazzling-faraday-7WQ38   開発ブランチ（現在・ダークモード実装）
 ```
 
 ---
 
 ## 次の実装予定
 
-### 🎯 直近：ダークモード実装 (進行中)
+### 🎯 直近：ダークモード実装 ✅ 完了
 
-**目的：** Tailwind CSS の `dark:` クラス群を使い、ライト/ダーク切り替えをサポート。設定は localStorage 保存。
-
-**実装手順：**
-1. `app/layout.tsx` に Theme Provider ロジックを追加（HTML class="dark" 制御）
-2. `components/SummaryCard.tsx` → `dark:bg-gray-800` など Dark 対応クラスを追加
-3. `components/SubscriptionForm.tsx` → フォーム要素を Dark 対応
-4. `components/SubscriptionList.tsx` → カード background, text, border を Dark 対応
-5. `components/CalendarView.tsx` → Calendar も Dark 対応
-6. `components/ListControls.tsx` → 検索・ソート UI を Dark 対応
-7. UI に Theme Toggle ボタン追加（ハンバーガーメニューか Header）
-8. `globals.css` に必要に応じて Dark mode 用 CSS 追加
-
-**対象ファイル（優先順）：**
-```
-app/layout.tsx               ← 最優先。Theme Provider を実装
-app/globals.css              ← Dark mode CSS
-components/SummaryCard.tsx   
-components/SubscriptionList.tsx
-components/SubscriptionForm.tsx
-components/CalendarView.tsx
-components/ListControls.tsx
-```
+ヘッダーのトグルでライト/ダークを切り替え可能。設定は localStorage に保存し、
+未設定時は OS の `prefers-color-scheme` に追従。描画前にクラスを確定して
+ちらつき（FOUC）も防止。完了チェックは「完了した機能 → 6. ダークモード対応」を参照。
 
 **完了チェック：**
-- [ ] Theme Provider ロジック実装
-- [ ] 全コンポーネント Dark クラス適用
-- [ ] Toggle UI 追加＆動作確認
-- [ ] localStorage での設定保存確認
-- [ ] ブラウザの `prefers-color-scheme` に従うか確認
+- [x] Theme Provider ロジック実装（インラインスクリプト + `useTheme` フック）
+- [x] 全コンポーネント Dark クラス適用
+- [x] Toggle UI 追加＆動作確認
+- [x] localStorage での設定保存確認
+- [x] ブラウザの `prefers-color-scheme` に従うか確認
+
+### 🎯 次の候補
+
+下の「その他の残課題 / 拡張アイデア」から、多通貨対応またはデータエクスポートが着手しやすい。
 
 ---
 
@@ -166,12 +171,14 @@ my-app/
 │   ├── ServiceWorkerRegister.tsx
 │   ├── SubscriptionForm.tsx
 │   ├── SubscriptionList.tsx
-│   └── SummaryCard.tsx
+│   ├── SummaryCard.tsx
+│   └── ThemeToggle.tsx       ← ダーク/ライト切り替えトグル
 ├── lib/
 │   ├── format.ts
 │   ├── templates.ts
 │   ├── types.ts
-│   └── useSubscriptions.ts
+│   ├── useSubscriptions.ts
+│   └── useTheme.ts           ← テーマ管理フック
 ├── public/
 │   ├── sw.js
 │   ├── icon-192.png
