@@ -25,6 +25,51 @@ export function cycleLabel(cycle: Subscription["cycle"]): string {
   return cycle === "yearly" ? "年額" : "月額";
 }
 
+// 一覧の並び替え方法
+export type SortKey = "created" | "priceDesc" | "billingSoon";
+
+export const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+  { value: "created", label: "登録順" },
+  { value: "priceDesc", label: "月額が高い順" },
+  { value: "billingSoon", label: "請求日が近い順" },
+];
+
+// 名前で絞り込み、指定キーで並び替えた新しい配列を返す（元配列は変更しない）
+export function filterAndSort(
+  subs: Subscription[],
+  query: string,
+  sort: SortKey,
+): Subscription[] {
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? subs.filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          (s.memo ?? "").toLowerCase().includes(q),
+      )
+    : subs;
+
+  const sorted = [...filtered];
+  switch (sort) {
+    case "priceDesc":
+      sorted.sort((a, b) => toMonthly(b) - toMonthly(a));
+      break;
+    case "billingSoon":
+      // 空の請求日は末尾へ
+      sorted.sort((a, b) => {
+        const da = a.nextBillingDate || "9999-99-99";
+        const db = b.nextBillingDate || "9999-99-99";
+        return da.localeCompare(db);
+      });
+      break;
+    case "created":
+    default:
+      sorted.sort((a, b) => b.createdAt - a.createdAt);
+      break;
+  }
+  return sorted;
+}
+
 // 日付を「2026年6月15日」形式に整形する
 export function formatDate(date: string): string {
   if (!date) return "未設定";
