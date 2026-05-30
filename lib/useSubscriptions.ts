@@ -51,9 +51,25 @@ export function useSubscriptions() {
     setSubscriptions((prev) => [sub, ...prev]);
   }, []);
 
+  // 既存サブスクの内容を更新する（idとcreatedAtは保持）
+  const updateSubscription = useCallback(
+    (id: string, input: SubscriptionInput) => {
+      setSubscriptions((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, ...input } : s)),
+      );
+    },
+    [],
+  );
+
   const removeSubscription = useCallback((id: string) => {
     setSubscriptions((prev) => prev.filter((s) => s.id !== id));
   }, []);
 
-  return { subscriptions, loaded, addSubscription, removeSubscription };
+  return {
+    subscriptions,
+    loaded,
+    addSubscription,
+    updateSubscription,
+    removeSubscription,
+  };
 }

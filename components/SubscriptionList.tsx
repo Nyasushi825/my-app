@@ -16,9 +16,13 @@ function initial(name: string): string {
 // 登録済みサブスクの一覧
 export function SubscriptionList({
   subscriptions,
+  editingId,
+  onEdit,
   onRemove,
 }: {
   subscriptions: Subscription[];
+  editingId: string | null;
+  onEdit: (sub: Subscription) => void;
   onRemove: (id: string) => void;
 }) {
   if (subscriptions.length === 0) {
@@ -40,7 +44,11 @@ export function SubscriptionList({
       {subscriptions.map((sub) => (
         <li
           key={sub.id}
-          className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+          className={`flex items-center gap-3 rounded-2xl border bg-white p-4 shadow-sm transition ${
+            editingId === sub.id
+              ? "border-brand-500 ring-2 ring-brand-100"
+              : "border-slate-200"
+          }`}
         >
           <div
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-lg font-bold text-white"
@@ -73,9 +81,29 @@ export function SubscriptionList({
 
           <button
             type="button"
+            onClick={() => onEdit(sub)}
+            aria-label={`${sub.name}を編集`}
+            className="ml-1 shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-brand-50 hover:text-brand-600"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-4 w-4"
+            >
+              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
             onClick={() => onRemove(sub.id)}
             aria-label={`${sub.name}を削除`}
-            className="ml-1 shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
+            className="shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
