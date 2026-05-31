@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { AuthButton } from "@/components/AuthButton";
 import { CalendarView } from "@/components/CalendarView";
 import { CancelledList } from "@/components/CancelledList";
 import { useLanguage } from "@/components/LanguageProvider";
@@ -70,6 +71,7 @@ export default function Home() {
           Subscription Management
         </h1>
         <div className="ml-auto flex items-center gap-2">
+          <AuthButton />
           <LanguageSelect />
           <ThemeToggle />
         </div>

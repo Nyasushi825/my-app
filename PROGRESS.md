@@ -142,6 +142,33 @@ components/LanguageSelect.tsx    言語切り替えセレクト
 
 ---
 
+### 9. Supabase連携（ログイン＋クラウド同期）🚧 土台実装
+
+収益化（フリーミアム）に向けた土台。ログインすると、登録したサブスクが
+端末をまたいでクラウド同期される。**鍵が未設定でも従来どおり localStorage で動作**
+するよう、安全に組み込んだ（非破壊）。
+
+- `@supabase/supabase-js` を導入
+- メールアドレス＋パスワードでのログイン/新規登録UI（ヘッダーに「ログイン」ボタン）
+- ログイン中は `user_data` テーブル（1ユーザー1行・全サブスクをJSONB保持）に同期
+  - 初回ログイン時は手元（localStorage）のデータをクラウドへ自動移行
+  - 変更は600msデバウンスでupsert
+- 公開鍵は `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+
+**追加ファイル**
+```
+lib/supabase.ts              Supabaseクライアント（未設定時はnull＝localStorageモード）
+components/AuthProvider.tsx   認証コンテキスト（user/signIn/signUp/signOut）
+components/AuthButton.tsx     ヘッダーのログイン/ログアウトUI（モーダル）
+```
+
+**残りの手動セットアップ（運用者が実施）**
+- [ ] Vercel に環境変数 `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` を登録
+- [ ] Supabase の SQL Editor で `user_data` テーブル＋RLSポリシーを作成
+- [ ] Supabase Auth の Redirect URLs に本番URLを追加（メール確認を使う場合）
+
+---
+
 ## 技術スタック
 
 | 項目 | バージョン |
