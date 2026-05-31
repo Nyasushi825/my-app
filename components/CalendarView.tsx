@@ -3,8 +3,7 @@
 import { useMemo, useState } from "react";
 import { formatMoney, getCurrency } from "@/lib/currency";
 import type { Subscription } from "@/lib/types";
-
-const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
+import { useLanguage } from "./LanguageProvider";
 
 // nextBillingDate から「請求日（日）」を取り出す
 function billingDay(sub: Subscription): number {
@@ -14,9 +13,28 @@ function billingDay(sub: Subscription): number {
 
 // 請求日カレンダー：表示中の月で、各サブスクの請求日にマーカーを表示する
 export function CalendarView({ subscriptions }: { subscriptions: Subscription[] }) {
+  const { t, locale } = useLanguage();
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth()); // 0-11
+
+  // ロケールに応じた曜日の短縮名（日曜始まり）。2024-01-07 は日曜
+  const weekdays = useMemo(() => {
+    const fmt = new Intl.DateTimeFormat(locale, { weekday: "short" });
+    return Array.from({ length: 7 }, (_, i) =>
+      fmt.format(new Date(2024, 0, 7 + i)),
+    );
+  }, [locale]);
+
+  // 「2026年6月」などロケールに応じた年月表記
+  const monthLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, {
+        year: "numeric",
+        month: "long",
+      }).format(new Date(year, month, 1)),
+    [locale, year, month],
+  );
 
   // 日（1-31）ごとに、その日が請求日のサブスクをまとめる
   const byDay = useMemo(() => {
@@ -50,23 +68,25 @@ export function CalendarView({ subscriptions }: { subscriptions: Subscription[] 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-base font-semibold text-slate-800 dark:text-slate-200">請求日カレンダー</h2>
+        <h2 className="text-base font-semibold text-slate-800 dark:text-slate-200">
+          {t("calendar_title")}
+        </h2>
         <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => shiftMonth(-1)}
-            aria-label="前の月"
+            aria-label={t("prev_month")}
             className="rounded-lg px-2 py-1 text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
           >
             ‹
           </button>
           <span className="min-w-[6.5rem] text-center text-sm font-medium text-slate-700 dark:text-slate-300">
-            {year}年{month + 1}月
+            {monthLabel}
           </span>
           <button
             type="button"
             onClick={() => shiftMonth(1)}
-            aria-label="次の月"
+            aria-label={t("next_month")}
             className="rounded-lg px-2 py-1 text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
           >
             ›
@@ -75,9 +95,9 @@ export function CalendarView({ subscriptions }: { subscriptions: Subscription[] 
       </div>
 
       <div className="grid grid-cols-7 gap-1 text-center">
-        {WEEKDAYS.map((w, i) => (
+        {weekdays.map((w, i) => (
           <div
-            key={w}
+            key={i}
             className={`pb-1 text-xs font-medium ${
               i === 0
                 ? "text-red-500"
@@ -133,7 +153,7 @@ export function CalendarView({ subscriptions }: { subscriptions: Subscription[] 
 
       {subscriptions.length === 0 && (
         <p className="mt-3 text-center text-xs text-slate-400 dark:text-slate-500">
-          サブスクを登録すると、請求日がこのカレンダーに表示されます
+          {t("calendar_empty")}
         </p>
       )}
     </section>

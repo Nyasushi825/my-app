@@ -1,18 +1,21 @@
 "use client";
 
 import { useTheme } from "@/lib/useTheme";
+import { useLanguage } from "./LanguageProvider";
 
 // ライト/ダークを切り替えるトグルボタン（ヘッダーに配置）
 export function ThemeToggle() {
   const { theme, toggle, mounted } = useTheme();
+  const { t } = useLanguage();
   const isDark = theme === "dark";
+  const label = isDark ? t("to_light") : t("to_dark");
 
   return (
     <button
       type="button"
       onClick={toggle}
-      aria-label={isDark ? "ライトモードに切り替え" : "ダークモードに切り替え"}
-      title={isDark ? "ライトモードに切り替え" : "ダークモードに切り替え"}
+      aria-label={label}
+      title={label}
       className="rounded-lg border border-slate-200 bg-white p-2 text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
     >
       {/* マウント前は hydration ミスマッチ回避のため固定アイコンを表示 */}

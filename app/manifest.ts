@@ -3,10 +3,10 @@ import type { MetadataRoute } from "next";
 // PWAマニフェスト（Next.jsのメタデータルート）。/manifest.webmanifest として配信される
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "サブスクBox",
-    short_name: "サブスクBox",
+    name: "Subscription Management",
+    short_name: "Subs Mgmt",
     description:
-      "契約中のサブスクを登録して、毎月いくら払っているか一目で把握できる管理アプリ",
+      "Track your subscriptions and see at a glance how much you pay each month.",
     start_url: "/",
     display: "standalone",
     background_color: "#f8fafc",

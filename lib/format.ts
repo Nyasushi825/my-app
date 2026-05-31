@@ -26,19 +26,10 @@ export function totalYearlyJPY(subs: Subscription[], rates: Rates): number {
   return totalMonthlyJPY(subs, rates) * 12;
 }
 
-// 請求サイクルの日本語ラベル
-export function cycleLabel(cycle: Subscription["cycle"]): string {
-  return cycle === "yearly" ? "年額" : "月額";
-}
-
-// 一覧の並び替え方法
+// 一覧の並び替え方法（ラベルは i18n の sort_* キーで引く）
 export type SortKey = "created" | "priceDesc" | "billingSoon";
 
-export const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-  { value: "created", label: "登録順" },
-  { value: "priceDesc", label: "月額が高い順" },
-  { value: "billingSoon", label: "請求日が近い順" },
-];
+export const SORT_KEYS: SortKey[] = ["created", "priceDesc", "billingSoon"];
 
 // 名前で絞り込み、指定キーで並び替えた新しい配列を返す（元配列は変更しない）
 // priceDesc は通貨をまたぐため円換算で比較する
@@ -78,10 +69,14 @@ export function filterAndSort(
   return sorted;
 }
 
-// 日付を「2026年6月15日」形式に整形する
-export function formatDate(date: string): string {
-  if (!date) return "未設定";
+// 日付をロケールに合わせて整形する（例: 2026年6月15日 / June 15, 2026）
+export function formatDate(date: string, locale: string): string {
+  if (!date) return "—";
   const d = new Date(date + "T00:00:00");
-  if (Number.isNaN(d.getTime())) return "未設定";
-  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+  if (Number.isNaN(d.getTime())) return "—";
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(d);
 }

@@ -124,6 +124,24 @@ lib/useExchangeRates.ts     為替レート取得＋キャッシュのフック
 
 ---
 
+### 8. タイトル変更＋多言語対応（i18n）✅
+
+- アプリ名を **「Subscription Management」** に変更（ヘッダー / metadata / manifest）
+- **5言語対応**：日本語 / English / 中文(简体) / Español / Français
+- ヘッダーに言語セレクトを追加。設定は `localStorage`（`subsuku-box:lang`）に保存し、
+  未設定時は `navigator.language` から自動判定
+- 全UIテキストを翻訳辞書（`lib/i18n.ts`）経由に置き換え
+- 日付・曜日・年月は `Intl.DateTimeFormat` でロケールに応じて自動整形
+
+**追加ファイル**
+```
+lib/i18n.ts                  翻訳辞書（5言語）＋プレースホルダ置換
+components/LanguageProvider.tsx  言語コンテキスト（useLanguage / t）
+components/LanguageSelect.tsx    言語切り替えセレクト
+```
+
+---
+
 ## 技術スタック
 
 | 項目 | バージョン |

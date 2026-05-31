@@ -1,14 +1,17 @@
 "use client";
 
-import { cycleLabel } from "@/lib/format";
 import { formatMoney, getCurrency } from "@/lib/currency";
 import type { Subscription } from "@/lib/types";
+import { useLanguage } from "./LanguageProvider";
 
-// 解約日時を「2026/5/30」形式に整形する
-function formatCancelledAt(ts?: number): string {
+// 解約日時をロケールに合わせて整形する
+function formatCancelledAt(ts: number | undefined, locale: string): string {
   if (!ts) return "";
-  const d = new Date(ts);
-  return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(new Date(ts));
 }
 
 // 解約済みサブスクの履歴（復元・削除）
@@ -21,14 +24,16 @@ export function CancelledList({
   onRestore: (id: string) => void;
   onRemove: (id: string) => void;
 }) {
+  const { t, locale } = useLanguage();
+
   if (subscriptions.length === 0) return null;
 
   return (
     <section className="mt-6">
       <h2 className="mb-3 text-base font-semibold text-slate-800 dark:text-slate-200">
-        解約履歴
+        {t("cancelled_history")}
         <span className="ml-2 text-xs font-normal text-slate-400 dark:text-slate-500">
-          {subscriptions.length}件
+          {t("count_items", { n: subscriptions.length })}
         </span>
       </h2>
 
@@ -43,8 +48,12 @@ export function CancelledList({
                 {sub.name}
               </p>
               <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
-                {formatMoney(sub.price, getCurrency(sub))} / {cycleLabel(sub.cycle)}
-                {sub.cancelledAt && ` ・ ${formatCancelledAt(sub.cancelledAt)} に解約`}
+                {formatMoney(sub.price, getCurrency(sub))} /{" "}
+                {t(sub.cycle === "yearly" ? "cycle_yearly" : "cycle_monthly")}
+                {sub.cancelledAt &&
+                  t("cancelled_on", {
+                    date: formatCancelledAt(sub.cancelledAt, locale),
+                  })}
               </p>
             </div>
 
@@ -53,12 +62,12 @@ export function CancelledList({
               onClick={() => onRestore(sub.id)}
               className="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-brand-600 transition hover:bg-brand-50 dark:border-slate-600 dark:bg-slate-900 dark:text-brand-400 dark:hover:bg-slate-800"
             >
-              復元
+              {t("restore")}
             </button>
             <button
               type="button"
               onClick={() => onRemove(sub.id)}
-              aria-label={`${sub.name}を完全に削除`}
+              aria-label={t("aria_delete", { name: sub.name })}
               className="shrink-0 rounded-lg p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-500 dark:text-slate-500 dark:hover:bg-red-950 dark:hover:text-red-400"
             >
               <svg
