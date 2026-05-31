@@ -1,6 +1,9 @@
 // サブスクの請求サイクル
 export type BillingCycle = "monthly" | "yearly";
 
+// 対応通貨（円・米ドル・ユーロ）
+export type Currency = "JPY" | "USD" | "EUR";
+
 // 契約状態（解約済みは履歴として残す）。未設定は "active" 扱い
 export type SubscriptionStatus = "active" | "cancelled";
 
@@ -8,7 +11,8 @@ export type SubscriptionStatus = "active" | "cancelled";
 export interface Subscription {
   id: string;
   name: string; // サービス名（例: Netflix）
-  price: number; // 金額（円）
+  price: number; // 金額（currency の単位）
+  currency?: Currency; // 通貨（未設定は JPY とみなす＝既存データ互換）
   cycle: BillingCycle; // 請求サイクル
   nextBillingDate: string; // 次回請求日 (YYYY-MM-DD)
   color: string; // アイコンに使う背景色（Tailwindのclassではなく16進）

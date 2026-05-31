@@ -1,16 +1,17 @@
 import type { Metadata, Viewport } from "next";
+import { LanguageProvider } from "@/components/LanguageProvider";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "サブスクBox",
+  title: "Subscription Management",
   description:
-    "契約中のサブスクを登録して、毎月いくら払っているか一目で把握できる管理アプリ",
-  applicationName: "サブスクBox",
+    "Track your subscriptions and see at a glance how much you pay each month.",
+  applicationName: "Subscription Management",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "サブスクBox",
+    title: "Subscription Management",
   },
   icons: {
     icon: "/icon-192.png",
@@ -43,7 +44,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
-        {children}
+        <LanguageProvider>{children}</LanguageProvider>
         <ServiceWorkerRegister />
       </body>
     </html>

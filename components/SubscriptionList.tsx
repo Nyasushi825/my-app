@@ -1,12 +1,9 @@
 "use client";
 
-import {
-  cycleLabel,
-  formatDate,
-  formatYen,
-  toMonthly,
-} from "@/lib/format";
+import { formatDate, toMonthly } from "@/lib/format";
+import { convert, formatMoney, getCurrency, type Rates } from "@/lib/currency";
 import type { Subscription } from "@/lib/types";
+import { useLanguage } from "./LanguageProvider";
 
 // サービス名の頭文字をアイコンに使う
 function initial(name: string): string {
@@ -17,23 +14,27 @@ function initial(name: string): string {
 export function SubscriptionList({
   subscriptions,
   editingId,
+  rates,
   onEdit,
   onCancel,
 }: {
   subscriptions: Subscription[];
   editingId: string | null;
+  rates: Rates;
   onEdit: (sub: Subscription) => void;
   onCancel: (id: string) => void;
 }) {
+  const { t, locale } = useLanguage();
+
   if (subscriptions.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center dark:border-slate-700 dark:bg-slate-900">
         <p className="text-3xl">📦</p>
         <p className="mt-2 text-sm font-medium text-slate-600 dark:text-slate-300">
-          まだサブスクが登録されていません
+          {t("empty_title")}
         </p>
         <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
-          左のフォームから最初のサブスクを追加しましょう
+          {t("empty_hint")}
         </p>
       </div>
     );
@@ -61,29 +62,46 @@ export function SubscriptionList({
             <div className="min-w-0 flex-1">
               <p className="truncate font-semibold text-slate-800 dark:text-slate-100">{sub.name}</p>
               <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                次回請求 {formatDate(sub.nextBillingDate)}
+                {t("next_billing_date", {
+                  date: formatDate(sub.nextBillingDate, locale),
+                })}
                 {sub.memo ? ` ・ ${sub.memo}` : ""}
               </p>
             </div>
 
             <div className="text-right">
               <p className="font-semibold text-slate-800 dark:text-slate-100">
-                {formatYen(sub.price)}
+                {formatMoney(sub.price, getCurrency(sub))}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {cycleLabel(sub.cycle)}
+                {t(sub.cycle === "yearly" ? "cycle_yearly" : "cycle_monthly")}
                 {sub.cycle === "yearly" && (
                   <span className="ml-1 text-slate-400 dark:text-slate-500">
-                    (月{formatYen(toMonthly(sub))})
+                    (
+                    {t("monthly_equiv", {
+                      amount: formatMoney(toMonthly(sub), getCurrency(sub)),
+                    })}
+                    )
                   </span>
                 )}
               </p>
+              {/* 外貨は円換算の目安も表示 */}
+              {getCurrency(sub) !== "JPY" && (
+                <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                  {t("approx_monthly", {
+                    amount: formatMoney(
+                      convert(toMonthly(sub), getCurrency(sub), "JPY", rates),
+                      "JPY",
+                    ),
+                  })}
+                </p>
+              )}
             </div>
 
             <button
               type="button"
               onClick={() => onEdit(sub)}
-              aria-label={`${sub.name}を編集`}
+              aria-label={t("aria_edit", { name: sub.name })}
               className="ml-1 shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-brand-50 hover:text-brand-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-brand-400"
             >
               <svg
@@ -110,7 +128,7 @@ export function SubscriptionList({
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
               >
-                解約手順を見る
+                {t("see_cancel_steps")}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -125,7 +143,9 @@ export function SubscriptionList({
                 </svg>
               </a>
             ) : (
-              <span className="text-xs text-slate-300 dark:text-slate-600">解約手順URL未設定</span>
+              <span className="text-xs text-slate-300 dark:text-slate-600">
+                {t("no_cancel_url")}
+              </span>
             )}
 
             <button
@@ -133,7 +153,7 @@ export function SubscriptionList({
               onClick={() => onCancel(sub.id)}
               className="rounded-lg border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-slate-700 dark:text-slate-300 dark:hover:border-red-900 dark:hover:bg-red-950 dark:hover:text-red-400"
             >
-              解約する
+              {t("cancel_action")}
             </button>
           </div>
         </li>

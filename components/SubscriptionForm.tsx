@@ -1,8 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { BillingCycle, Subscription, SubscriptionInput } from "@/lib/types";
+import type {
+  BillingCycle,
+  Currency,
+  Subscription,
+  SubscriptionInput,
+} from "@/lib/types";
+import { CURRENCIES } from "@/lib/currency";
 import { TEMPLATES } from "@/lib/templates";
+import { useLanguage } from "./LanguageProvider";
 
 // 今日の日付を YYYY-MM-DD で返す
 function today(): string {
@@ -15,6 +22,7 @@ function emptyForm(): SubscriptionInput {
   return {
     name: "",
     price: 0,
+    currency: "JPY",
     cycle: "monthly",
     nextBillingDate: today(),
     color: DEFAULT_COLOR,
@@ -25,8 +33,18 @@ function emptyForm(): SubscriptionInput {
 
 // Subscription から編集用の入力値だけを取り出す
 function toInput(sub: Subscription): SubscriptionInput {
-  const { name, price, cycle, nextBillingDate, color, memo, cancelUrl } = sub;
-  return { name, price, cycle, nextBillingDate, color, memo, cancelUrl };
+  const { name, price, currency, cycle, nextBillingDate, color, memo, cancelUrl } =
+    sub;
+  return {
+    name,
+    price,
+    currency: currency ?? "JPY",
+    cycle,
+    nextBillingDate,
+    color,
+    memo,
+    cancelUrl,
+  };
 }
 
 // サブスクを登録・編集するフォーム
@@ -41,6 +59,7 @@ export function SubscriptionForm({
   onUpdate: (id: string, input: SubscriptionInput) => void;
   onCancelEdit: () => void;
 }) {
+  const { t } = useLanguage();
   const [form, setForm] = useState<SubscriptionInput>(emptyForm());
   const [error, setError] = useState<string | null>(null);
 
@@ -60,11 +79,11 @@ export function SubscriptionForm({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name.trim()) {
-      setError("サービス名を入力してください");
+      setError(t("err_name"));
       return;
     }
     if (!form.price || form.price <= 0) {
-      setError("金額は1円以上で入力してください");
+      setError(t("err_price"));
       return;
     }
     const value = { ...form, name: form.name.trim() };
@@ -86,7 +105,7 @@ export function SubscriptionForm({
       className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
     >
       <h2 className="text-base font-semibold text-slate-800 dark:text-slate-200">
-        {editing ? "サブスクを編集" : "サブスクを登録"}
+        {editing ? t("form_edit_title") : t("form_add_title")}
       </h2>
 
       {/* テンプレートからワンタップで入力補助（新規登録時のみ表示） */}
@@ -101,6 +120,7 @@ export function SubscriptionForm({
                   ...prev,
                   name: t.name,
                   price: t.price,
+                  currency: "JPY",
                   cycle: t.cycle,
                   color: t.color,
                   cancelUrl: t.cancelUrl,
@@ -117,13 +137,13 @@ export function SubscriptionForm({
       <div className="mt-4 space-y-3">
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-            サービス名
+            {t("field_name")}
           </label>
           <input
             type="text"
             value={form.name}
             onChange={(e) => update("name", e.target.value)}
-            placeholder="例: Netflix"
+            placeholder={t("ph_name")}
             className={inputClass}
           />
         </div>
@@ -131,11 +151,12 @@ export function SubscriptionForm({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-              金額（円）
+              {t("field_price")}
             </label>
             <input
               type="number"
               min={0}
+              step="any"
               value={form.price || ""}
               onChange={(e) => update("price", Number(e.target.value))}
               placeholder="1490"
@@ -144,15 +165,18 @@ export function SubscriptionForm({
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-              請求サイクル
+              {t("field_currency")}
             </label>
             <select
-              value={form.cycle}
-              onChange={(e) => update("cycle", e.target.value as BillingCycle)}
+              value={form.currency ?? "JPY"}
+              onChange={(e) => update("currency", e.target.value as Currency)}
               className={inputClass}
             >
-              <option value="monthly">月額</option>
-              <option value="yearly">年額</option>
+              {CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.symbol} {t(`cur_${c.code}`)}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -160,7 +184,20 @@ export function SubscriptionForm({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-              次回請求日
+              {t("field_cycle")}
+            </label>
+            <select
+              value={form.cycle}
+              onChange={(e) => update("cycle", e.target.value as BillingCycle)}
+              className={inputClass}
+            >
+              <option value="monthly">{t("cycle_monthly")}</option>
+              <option value="yearly">{t("cycle_yearly")}</option>
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+              {t("field_next_billing")}
             </label>
             <input
               type="date"
@@ -169,41 +206,42 @@ export function SubscriptionForm({
               className={inputClass}
             />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-              カラー
-            </label>
-            <input
-              type="color"
-              value={form.color}
-              onChange={(e) => update("color", e.target.value)}
-              className="h-[38px] w-full cursor-pointer rounded-lg border border-slate-300 p-1 dark:border-slate-600 dark:bg-slate-800"
-            />
-          </div>
         </div>
 
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-            解約手順URL（任意）
+            {t("field_color")}
+          </label>
+          <input
+            type="color"
+            value={form.color}
+            onChange={(e) => update("color", e.target.value)}
+            className="h-[38px] w-full cursor-pointer rounded-lg border border-slate-300 p-1 dark:border-slate-600 dark:bg-slate-800"
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+            {t("field_cancel_url")}
           </label>
           <input
             type="url"
             value={form.cancelUrl ?? ""}
             onChange={(e) => update("cancelUrl", e.target.value)}
-            placeholder="https://..."
+            placeholder={t("ph_url")}
             className={inputClass}
           />
         </div>
 
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-            メモ（任意）
+            {t("field_memo")}
           </label>
           <input
             type="text"
             value={form.memo ?? ""}
             onChange={(e) => update("memo", e.target.value)}
-            placeholder="家族と共有 など"
+            placeholder={t("ph_memo")}
             className={inputClass}
           />
         </div>
@@ -216,7 +254,7 @@ export function SubscriptionForm({
           type="submit"
           className="flex-1 rounded-lg bg-brand-600 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
         >
-          {editing ? "更新する" : "登録する"}
+          {editing ? t("btn_update") : t("btn_add")}
         </button>
         {editing && (
           <button
@@ -224,7 +262,7 @@ export function SubscriptionForm({
             onClick={onCancelEdit}
             className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
           >
-            キャンセル
+            {t("btn_cancel")}
           </button>
         )}
       </div>
