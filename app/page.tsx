@@ -10,6 +10,7 @@ import { SummaryCard } from "@/components/SummaryCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { filterAndSort, type SortKey } from "@/lib/format";
 import { isActive, type Subscription } from "@/lib/types";
+import { useExchangeRates } from "@/lib/useExchangeRates";
 import { useSubscriptions } from "@/lib/useSubscriptions";
 
 export default function Home() {
@@ -22,6 +23,10 @@ export default function Home() {
     restoreSubscription,
     removeSubscription,
   } = useSubscriptions();
+
+  // 為替レート（各通貨→円。リアルタイム取得＋キャッシュ）
+  const { rates, status: rateStatus, updatedAt: rateUpdatedAt } =
+    useExchangeRates();
 
   // 編集中のサブスク（nullなら新規登録モード）
   const [editing, setEditing] = useState<Subscription | null>(null);
@@ -39,8 +44,8 @@ export default function Home() {
 
   // 一覧表示用に絞り込み・並び替えした契約中サブスク（合計やカレンダーには影響しない）
   const visibleActive = useMemo(
-    () => filterAndSort(active, query, sort),
-    [active, query, sort],
+    () => filterAndSort(active, query, sort, rates),
+    [active, query, sort, rates],
   );
 
   function handleCancel(id: string) {
@@ -65,7 +70,12 @@ export default function Home() {
         </div>
       </header>
 
-      <SummaryCard subscriptions={active} />
+      <SummaryCard
+        subscriptions={active}
+        rates={rates}
+        rateStatus={rateStatus}
+        rateUpdatedAt={rateUpdatedAt}
+      />
 
       <div className="mt-6 grid gap-6 md:grid-cols-2">
         <SubscriptionForm
@@ -105,6 +115,7 @@ export default function Home() {
                 <SubscriptionList
                   subscriptions={visibleActive}
                   editingId={editing?.id ?? null}
+                  rates={rates}
                   onEdit={setEditing}
                   onCancel={handleCancel}
                 />

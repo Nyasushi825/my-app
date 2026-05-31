@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { BillingCycle, Subscription, SubscriptionInput } from "@/lib/types";
+import type {
+  BillingCycle,
+  Currency,
+  Subscription,
+  SubscriptionInput,
+} from "@/lib/types";
+import { CURRENCIES } from "@/lib/currency";
 import { TEMPLATES } from "@/lib/templates";
 
 // 今日の日付を YYYY-MM-DD で返す
@@ -15,6 +21,7 @@ function emptyForm(): SubscriptionInput {
   return {
     name: "",
     price: 0,
+    currency: "JPY",
     cycle: "monthly",
     nextBillingDate: today(),
     color: DEFAULT_COLOR,
@@ -25,8 +32,18 @@ function emptyForm(): SubscriptionInput {
 
 // Subscription から編集用の入力値だけを取り出す
 function toInput(sub: Subscription): SubscriptionInput {
-  const { name, price, cycle, nextBillingDate, color, memo, cancelUrl } = sub;
-  return { name, price, cycle, nextBillingDate, color, memo, cancelUrl };
+  const { name, price, currency, cycle, nextBillingDate, color, memo, cancelUrl } =
+    sub;
+  return {
+    name,
+    price,
+    currency: currency ?? "JPY",
+    cycle,
+    nextBillingDate,
+    color,
+    memo,
+    cancelUrl,
+  };
 }
 
 // サブスクを登録・編集するフォーム
@@ -101,6 +118,7 @@ export function SubscriptionForm({
                   ...prev,
                   name: t.name,
                   price: t.price,
+                  currency: "JPY",
                   cycle: t.cycle,
                   color: t.color,
                   cancelUrl: t.cancelUrl,
@@ -131,17 +149,37 @@ export function SubscriptionForm({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-              金額（円）
+              金額
             </label>
             <input
               type="number"
               min={0}
+              step="any"
               value={form.price || ""}
               onChange={(e) => update("price", Number(e.target.value))}
               placeholder="1490"
               className={inputClass}
             />
           </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+              通貨
+            </label>
+            <select
+              value={form.currency ?? "JPY"}
+              onChange={(e) => update("currency", e.target.value as Currency)}
+              className={inputClass}
+            >
+              {CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.symbol} {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
               請求サイクル
@@ -155,9 +193,6 @@ export function SubscriptionForm({
               <option value="yearly">年額</option>
             </select>
           </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
               次回請求日
@@ -169,17 +204,18 @@ export function SubscriptionForm({
               className={inputClass}
             />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-              カラー
-            </label>
-            <input
-              type="color"
-              value={form.color}
-              onChange={(e) => update("color", e.target.value)}
-              className="h-[38px] w-full cursor-pointer rounded-lg border border-slate-300 p-1 dark:border-slate-600 dark:bg-slate-800"
-            />
-          </div>
+        </div>
+
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+            カラー
+          </label>
+          <input
+            type="color"
+            value={form.color}
+            onChange={(e) => update("color", e.target.value)}
+            className="h-[38px] w-full cursor-pointer rounded-lg border border-slate-300 p-1 dark:border-slate-600 dark:bg-slate-800"
+          />
         </div>
 
         <div>

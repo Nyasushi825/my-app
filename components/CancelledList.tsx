@@ -1,6 +1,7 @@
 "use client";
 
-import { cycleLabel, formatYen } from "@/lib/format";
+import { cycleLabel } from "@/lib/format";
+import { formatMoney, getCurrency } from "@/lib/currency";
 import type { Subscription } from "@/lib/types";
 
 // 解約日時を「2026/5/30」形式に整形する
@@ -42,7 +43,7 @@ export function CancelledList({
                 {sub.name}
               </p>
               <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
-                {formatYen(sub.price)} / {cycleLabel(sub.cycle)}
+                {formatMoney(sub.price, getCurrency(sub))} / {cycleLabel(sub.cycle)}
                 {sub.cancelledAt && ` ・ ${formatCancelledAt(sub.cancelledAt)} に解約`}
               </p>
             </div>

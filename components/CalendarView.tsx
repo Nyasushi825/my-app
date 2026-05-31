@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatYen } from "@/lib/format";
+import { formatMoney, getCurrency } from "@/lib/currency";
 import type { Subscription } from "@/lib/types";
 
 const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
@@ -120,7 +120,7 @@ export function CalendarView({ subscriptions }: { subscriptions: Subscription[] 
                 {subs.map((s) => (
                   <span
                     key={s.id}
-                    title={`${s.name}（${formatYen(s.price)}）`}
+                    title={`${s.name}（${formatMoney(s.price, getCurrency(s))}）`}
                     className="h-1.5 w-1.5 rounded-full"
                     style={{ backgroundColor: s.color }}
                   />

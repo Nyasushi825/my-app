@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  cycleLabel,
-  formatDate,
-  formatYen,
-  toMonthly,
-} from "@/lib/format";
+import { cycleLabel, formatDate, toMonthly } from "@/lib/format";
+import { convert, formatMoney, getCurrency, type Rates } from "@/lib/currency";
 import type { Subscription } from "@/lib/types";
 
 // サービス名の頭文字をアイコンに使う
@@ -17,11 +13,13 @@ function initial(name: string): string {
 export function SubscriptionList({
   subscriptions,
   editingId,
+  rates,
   onEdit,
   onCancel,
 }: {
   subscriptions: Subscription[];
   editingId: string | null;
+  rates: Rates;
   onEdit: (sub: Subscription) => void;
   onCancel: (id: string) => void;
 }) {
@@ -68,16 +66,27 @@ export function SubscriptionList({
 
             <div className="text-right">
               <p className="font-semibold text-slate-800 dark:text-slate-100">
-                {formatYen(sub.price)}
+                {formatMoney(sub.price, getCurrency(sub))}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 {cycleLabel(sub.cycle)}
                 {sub.cycle === "yearly" && (
                   <span className="ml-1 text-slate-400 dark:text-slate-500">
-                    (月{formatYen(toMonthly(sub))})
+                    (月{formatMoney(toMonthly(sub), getCurrency(sub))})
                   </span>
                 )}
               </p>
+              {/* 外貨は円換算の目安も表示 */}
+              {getCurrency(sub) !== "JPY" && (
+                <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                  ≈
+                  {formatMoney(
+                    convert(toMonthly(sub), getCurrency(sub), "JPY", rates),
+                    "JPY",
+                  )}
+                  /月
+                </p>
+              )}
             </div>
 
             <button
